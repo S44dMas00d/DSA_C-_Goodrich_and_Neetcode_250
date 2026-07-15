@@ -9,7 +9,6 @@ template <typename E>
 class CNode {
     E elem;
     CNode<E>* next;
-    CNode<E>* prev;
     friend class CLinkedList<E>;
 };
 
@@ -70,7 +69,33 @@ void CLinkedList<E>::advance()
 {
     if (empty())
         throw std::out_of_range("CLinkedList::advance(): list is empty");
-    if (cursor->next == cursor)
-        throw std::out_of_range("CLinkedList::advance(): there is no next element after cursor");
     cursor = cursor->next;
+}
+
+template <typename E>
+void CLinkedList<E>::add(const E& e)
+{
+    CNode<E>* v = new CNode<E>;
+    v->elem = e;
+    if (cursor == nullptr) {
+        v->next = v;
+        cursor = v;
+    } else {
+        v->next = cursor->next;
+        cursor->next = v;
+    }
+}
+
+template <typename E>
+void CLinkedList<E>::remove()
+{
+    if (empty())
+        throw std::out_of_range("CLinkedList::remove(): list is empty");
+    CNode<E>* old = cursor->next;
+    if (old == cursor) {
+        cursor = nullptr;
+    } else {
+        cursor->next = old->next;
+    }
+    delete old;
 }
