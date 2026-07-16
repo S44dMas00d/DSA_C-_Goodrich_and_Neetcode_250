@@ -11,9 +11,9 @@ endif()
 
 add_compile_options(-Wall -Wextra -g)
 
-# Your own data structure implementations (header-only) live in common/include,
-# e.g. common/include/list_node.hpp, common/include/tree_node.hpp, ...
-include_directories(${CMAKE_SOURCE_DIR}/common/include)
+# Your own data structure implementations (header-only) live in common/,
+# e.g. common/Singly_Linked_List.hpp, common/Doubly_Linked_List.hpp, ...
+include_directories(${CMAKE_SOURCE_DIR}/common)
 
 # Every .cpp file under a chapter folder (ch03/, ch04/, ...) is treated as one
 # self-contained LeetCode question with its own main(). Each becomes its own

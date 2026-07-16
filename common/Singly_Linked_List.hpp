@@ -22,10 +22,69 @@ public:
     const E& front() const;
     void addFront(const E& e);
     void removeFront();
+    SNode<E>* find(const E& e);
+    bool contains(const E& e);
+    void remove(SNode<E>* v); // remove the node v
 
 private:
     SNode<E>* head;
 };
+
+template <typename E>
+void SLinkedList<E>::remove(SNode<E>* v)
+{
+    if (v == nullptr || head == nullptr)
+        return;
+
+    if (head == v) {
+        head = head->next;
+        delete v;
+        return;
+    }
+
+    SNode<E>* rear = head;
+    SNode<E>* fwd = head->next;
+    while (fwd != nullptr && fwd != v) {
+        rear = rear->next;
+        fwd = fwd->next;
+    }
+    if (fwd == nullptr) {
+        return;
+    }
+    rear->next = fwd->next;
+    delete fwd;
+}
+
+template <typename E>
+SNode<E>* SLinkedList<E>::find(const E& e)
+{
+    if (empty())
+        return nullptr;
+
+    SNode<E>* res = head;
+    while (res != nullptr) {
+        if (res->elem == e) {
+            return res;
+        }
+        res = res->next;
+    }
+    return nullptr;
+}
+template <typename E>
+bool SLinkedList<E>::contains(const E& e)
+{
+    if (empty())
+        return false;
+
+    SNode<E>* curr = head;
+    while (curr != nullptr) {
+        if (curr->elem == e) {
+            return true;
+        }
+        curr = curr->next;
+    }
+    return false;
+}
 
 template <typename E>
 SLinkedList<E>::SLinkedList()
