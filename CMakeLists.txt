@@ -1,4 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
+
+# Pin the native compiler explicitly. This machine also has an ARM
+# bare-metal cross-compiler (gcc-arm-none-eabi) on PATH for embedded work,
+# and CMake will happily cache that instead of the native one if it gets
+# picked up first, which breaks linking (no hosted _exit/libc).
+if(NOT CMAKE_CXX_COMPILER)
+    set(CMAKE_CXX_COMPILER /usr/bin/g++)
+endif()
+if(NOT CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER /usr/bin/gcc)
+endif()
+
 project(DSA_LeetCode CXX)
 
 set(CMAKE_CXX_STANDARD 20)
