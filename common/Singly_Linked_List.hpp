@@ -7,7 +7,7 @@ class SLinkedList;
 
 template <typename E>
 class SNode {
-private:
+public:
     E elem;
     SNode<E>* next;
     friend class SLinkedList<E>;
@@ -16,6 +16,7 @@ private:
 template <typename E>
 class SLinkedList {
 public:
+    // methods:
     SLinkedList();
     ~SLinkedList();
     bool empty() const;
@@ -23,7 +24,11 @@ public:
     void addFront(const E& e);
     void removeFront();
     SNode<E>* find(const E& e);
+    template <typename KeyEqual>
+    SNode<E>* find(const E& e, KeyEqual eq);
     bool contains(const E& e);
+    template <typename KeyEqual>
+    bool contains(const E& e, KeyEqual eq); // new overload
     void remove(SNode<E>* v); // remove the node v
 
 private:
@@ -56,6 +61,23 @@ void SLinkedList<E>::remove(SNode<E>* v)
 }
 
 template <typename E>
+template <typename KeyEqual>
+SNode<E>* SLinkedList<E>::find(const E& e, KeyEqual eq)
+{
+    if (empty())
+        return nullptr;
+
+    SNode<E>* res = head;
+    while (res != nullptr) {
+        if (eq(res->elem, e)) {
+            return res;
+        }
+        res = res->next;
+    }
+    return nullptr;
+}
+
+template <typename E>
 SNode<E>* SLinkedList<E>::find(const E& e)
 {
     if (empty())
@@ -70,6 +92,24 @@ SNode<E>* SLinkedList<E>::find(const E& e)
     }
     return nullptr;
 }
+
+template <typename E>
+template <typename KeyEqual>
+bool SLinkedList<E>::contains(const E& e, KeyEqual eq)
+{
+    if (empty())
+        return false;
+
+    SNode<E>* curr = head;
+    while (curr != nullptr) {
+        if (eq(curr->elem, e)) {
+            return true;
+        }
+        curr = curr->next;
+    }
+    return false;
+}
+
 template <typename E>
 bool SLinkedList<E>::contains(const E& e)
 {
