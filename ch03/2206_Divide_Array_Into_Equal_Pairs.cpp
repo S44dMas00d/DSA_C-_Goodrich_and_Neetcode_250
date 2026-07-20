@@ -12,43 +12,33 @@ public:
         if (num_size % 2 != 0 && num_size <= 1) {
             return false;
         }
-        auto findInVector = [](const std::vector<int>& v, int value) {
-            for (auto iter = v.begin(); iter != v.end(); ++iter) {
-                if (*iter == value)
-                    return true;
-            }
-            return false;
-        };
-        int pair_count = 0;
         int i = 0;
-        int j = 1;
-        vector<int> last_pair_i_s;
-        vector<int> last_pair_j_s;
-        bool pair_checked = false;
-        while ((i < j) && j < num_size) {
-            if (nums[i] == nums[j]) {
-                pair_checked = true;
-                pair_count++;
+        int j = 0;
+        // first we need to sort it
+        for (i = 1; i < num_size; i++) {
+            int curr = nums[i];
+            j = i - 1;
+            while ((j >= 0) && (nums[j] > curr)) {
+                nums[j + 1] = nums[j];
+                j--;
             }
-            if (pair_checked) {
-                if (findInVector(last_pair_j_s, i + 1)) {
-                    last_pair_i_s.push_back(i);
-                    i = last_pair_j_s.back() + 1;
-                    if (i == j) {
-                        i++;
-                    }
-                } else {
-                    last_pair_i_s.push_back(i);
-                    i++;
-                }
-                last_pair_j_s.push_back(j);
-                j = i + 1;
+            nums[j + 1] = curr;
+        }
+        int pair_count = 0;
+        int expected_num_pairs = num_size / 2;
+        // now we need to do sliding window:
+        i = 0;
+        j = 1;
+        while ((i < j) && (j < num_size)) {
+            if (nums[i] == nums[j]) {
+                i = i + 2;
+                j = j + 2;
+                pair_count++;
             } else {
-                pair_checked = false;
+                i++;
                 j++;
             }
         }
-        int expected_num_pairs = num_size / 2;
         return expected_num_pairs == pair_count;
     }
 };
