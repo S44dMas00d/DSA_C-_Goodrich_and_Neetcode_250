@@ -31,7 +31,8 @@ public:
     bool contains(const E& e, KeyEqual eq); // new overload
     void remove(SNode<E>* v); // remove the node v
 
-private:
+    // private:
+public:
     SNode<E>* head;
 };
 
