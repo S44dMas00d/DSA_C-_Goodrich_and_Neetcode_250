@@ -11,6 +11,13 @@ public:
     E elem;
     SNode<E>* next;
     friend class SLinkedList<E>;
+    SNode()
+        : elem()
+        , next(nullptr)
+    {
+    }
+
+    ~SNode() = default;
 };
 
 template <typename E>
