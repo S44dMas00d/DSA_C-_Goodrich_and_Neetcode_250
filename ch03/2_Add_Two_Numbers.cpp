@@ -34,7 +34,7 @@ public:
         int remainder = 0;
         while (head1 || head2 || carry) {
             int sum = (head1 ? head1->elem : 0) + (head2 ? head2->elem : 0) + carry;
-            carry = static_cast<int>((sum) / 10);
+            carry = static_cast<int>(sum / 10);
             remainder = sum % 10;
             curr = new ListNode();
             curr->elem = remainder;
