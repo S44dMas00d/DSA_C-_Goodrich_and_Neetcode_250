@@ -63,8 +63,8 @@ int main()
     Solution Sol;
     SLinkedList<int> SLL1;
     // std::vector<int> nums1 = { 3, 1, 2, 4 };
-    // std::vector<int> nums1 = { 3, 1, 2, 4 };
-    std::vector<int> nums1 = { 4, 2, 1 };
+    std::vector<int> nums1 = { 3, 1, 2, 4 };
+    // std::vector<int> nums1 = { 4, 2, 1 };
     for (size_t i = 0; i < nums1.size(); i++) {
         SLL1.addFront(nums1[i]);
     }
