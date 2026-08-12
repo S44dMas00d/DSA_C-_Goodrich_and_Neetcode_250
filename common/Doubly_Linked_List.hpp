@@ -7,6 +7,7 @@ class DLinkedList;
 
 template <typename E>
 class DNode {
+public:
     E elem;
     DNode<E>* next;
     DNode<E>* prev;
@@ -24,17 +25,22 @@ public:
     const E& front() const; // get reference to front element
     const E& back() const; // get reference to back element
     void addFront(const E& e); // add element to front of list
+    DNode<E>* addFrontwRefReturn(const E& e); // add element to front of list
     void addBack(const E& e); // add element to back of list
     void removeFront(); // remove an element from front
     void removeBack(); // remove an element from back
 
-private:
+    // public:
+public:
     DNode<E>* header; // header sentinel
     DNode<E>* trailer; // trailer sentinel
 
-protected:
+    // protected:
+public:
     void add(DNode<E>* v, const E& e); // insert new node before v
+    DNode<E>* addwRefReturn(DNode<E>* v, const E& e); // insert new node before v
     void remove(DNode<E>* v); // remove the node v
+    DNode<E>* removewRefReturn(DNode<E>* v); // remove the node v and return its pointer (no deletion)
 };
 
 template <typename E>
@@ -89,6 +95,18 @@ void DLinkedList<E>::add(DNode<E>* v, const E& e)
 }
 
 template <typename E>
+DNode<E>* DLinkedList<E>::addwRefReturn(DNode<E>* v, const E& e)
+{
+    DNode<E>* u = new DNode<E>;
+    u->elem = e;
+    u->next = v;
+    u->prev = v->prev;
+    v->prev->next = u;
+    v->prev = u;
+    return u;
+}
+
+template <typename E>
 void DLinkedList<E>::remove(DNode<E>* v)
 {
     DNode<E>* prev_node = v->prev;
@@ -101,9 +119,28 @@ void DLinkedList<E>::remove(DNode<E>* v)
 }
 
 template <typename E>
+DNode<E>* removewRefReturn(DNode<E>* v)
+{
+    DNode<E>* prev_node = v->prev;
+    DNode<E>* next_node = v->next;
+    prev_node->next = next_node;
+    next_node->prev = prev_node;
+    v->next = nullptr;
+    v->prev = nullptr;
+    return v;
+}
+
+template <typename E>
 void DLinkedList<E>::addFront(const E& e)
 {
     add(header->next, e);
+}
+
+template <typename E>
+DNode<E>* DLinkedList<E>::addFrontwRefReturn(const E& e)
+{
+    DNode<E>* nodeRefReturn = addwRefReturn(header->next, e);
+    return nodeRefReturn;
 }
 
 template <typename E>
