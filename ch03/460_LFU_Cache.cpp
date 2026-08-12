@@ -60,20 +60,24 @@ public:
         DLL.add(dummyWallNode, dNodePtr);
     }
 
+    void promote(DNode<LFUNodeData>* dNodePtr)
+    {
+        if (dNodePtr->elem.count == 1) {
+            leftSwapAcrossDummyWallNode(dNodePtr);
+        }
+        dNodePtr->elem.count++;
+        while (dNodePtr->prev != DLL.header && dNodePtr->prev->elem.count <= dNodePtr->elem.count) {
+            leftSwap(dNodePtr);
+        }
+    }
+
     int get(int key)
     {
         if (!LFUNodeAddrMap.count(key)) {
             return -1;
         }
         DNode<LFUNodeData>* dNodePtr = LFUNodeAddrMap.at(key);
-
-        if (dNodePtr->elem.count == 1) {
-            leftSwapAcrossDummyWallNode(dNodePtr);
-            leftSwap(dNodePtr);
-        } else {
-            leftSwap(dNodePtr);
-        }
-        dNodePtr->elem.count++;
+        promote(dNodePtr);
         return dNodePtr->elem.value;
     }
 
@@ -85,14 +89,7 @@ public:
 
             // Update value
             dNodePtr->elem.value = value;
-
-            if (dNodePtr->elem.count == 1) {
-                leftSwapAcrossDummyWallNode(dNodePtr);
-                leftSwap(dNodePtr);
-            } else {
-                leftSwap(dNodePtr);
-            }
-            dNodePtr->elem.count++;
+            promote(dNodePtr);
             return;
         }
         // now if the key does not exist in the map - this means the key must be introduced into the map and DLL
