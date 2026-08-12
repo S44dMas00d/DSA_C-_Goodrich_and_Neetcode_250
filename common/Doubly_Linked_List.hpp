@@ -38,9 +38,10 @@ public:
     // protected:
 public:
     void add(DNode<E>* v, const E& e); // insert new node before v
+    void add(DNode<E>* v, DNode<E>* n); // insert new node before v
     DNode<E>* addwRefReturn(DNode<E>* v, const E& e); // insert new node before v
     void remove(DNode<E>* v); // remove the node v
-    DNode<E>* removewRefReturn(DNode<E>* v); // remove the node v and return its pointer (no deletion)
+    void removeWoDelete(DNode<E>* v); // remove the node v from DLL but dont delete it so that it stays on the heap
 };
 
 template <typename E>
@@ -84,6 +85,18 @@ const E& DLinkedList<E>::back() const
 }
 
 template <typename E>
+void DLinkedList<E>::add(DNode<E>* v, DNode<E>* n)
+{
+    if (v == n) {
+        return;
+    }
+    n->next = v;
+    n->prev = v->prev;
+    v->prev->next = n;
+    v->prev = n;
+}
+
+template <typename E>
 void DLinkedList<E>::add(DNode<E>* v, const E& e)
 {
     DNode<E>* u = new DNode<E>;
@@ -119,7 +132,7 @@ void DLinkedList<E>::remove(DNode<E>* v)
 }
 
 template <typename E>
-DNode<E>* removewRefReturn(DNode<E>* v)
+void DLinkedList<E>::removeWoDelete(DNode<E>* v)
 {
     DNode<E>* prev_node = v->prev;
     DNode<E>* next_node = v->next;
@@ -127,7 +140,6 @@ DNode<E>* removewRefReturn(DNode<E>* v)
     next_node->prev = prev_node;
     v->next = nullptr;
     v->prev = nullptr;
-    return v;
 }
 
 template <typename E>

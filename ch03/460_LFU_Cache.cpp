@@ -4,30 +4,27 @@
 #include <utility>
 #include <vector>
 
-// TODO: COUNTER ADD
-
 struct LFUNodeData {
     int key;
     int value;
+    int count;
 };
 
 class LFUCache {
 public:
     std::unordered_map<int, DNode<LFUNodeData>*> LFUNodeAddrMap;
-    std::unordered_map<DNode<LFUNodeData>*, int> LFUAddrNodeCountMap;
+    DNode<LFUNodeData>* dummyWallNode;
     DLinkedList<LFUNodeData> DLL;
     int size;
     int capacity;
-    bool swapsActive;
 
     LFUCache(int capacity)
         : LFUNodeAddrMap()
-        , LFUAddrNodeCountMap()
         , DLL()
         , size(0)
         , capacity(capacity)
-        , swapsActive(false)
     {
+        dummyWallNode = DLL.addwRefReturn(DLL.trailer, LFUNodeData { -1, -1, -1 });
     }
 
     void leftSwap(DNode<LFUNodeData>* dNodePtr)
@@ -57,6 +54,12 @@ public:
         swap1->prev = swap2;
     }
 
+    void leftSwapAcrossDummyWallNode(DNode<LFUNodeData>* dNodePtr)
+    {
+        DLL.removeWoDelete(dNodePtr);
+        DLL.add(dummyWallNode, dNodePtr);
+    }
+
     int get(int key)
     {
         if (!LFUNodeAddrMap.count(key)) {
@@ -64,12 +67,13 @@ public:
         }
         DNode<LFUNodeData>* dNodePtr = LFUNodeAddrMap.at(key);
 
-        if (!swapsActive) {
-            swapsActive = true;
+        if (dNodePtr->elem.count == 1) {
+            leftSwapAcrossDummyWallNode(dNodePtr);
+            leftSwap(dNodePtr);
+        } else {
+            leftSwap(dNodePtr);
         }
-
-        leftSwap(dNodePtr);
-
+        dNodePtr->elem.count++;
         return dNodePtr->elem.value;
     }
 
@@ -82,31 +86,30 @@ public:
             // Update value
             dNodePtr->elem.value = value;
 
-            if (!swapsActive) {
-                swapsActive = true;
+            if (dNodePtr->elem.count == 1) {
+                leftSwapAcrossDummyWallNode(dNodePtr);
+                leftSwap(dNodePtr);
+            } else {
+                leftSwap(dNodePtr);
             }
-
-            leftSwap(dNodePtr);
+            dNodePtr->elem.count++;
+            return;
         }
         // now if the key does not exist in the map - this means the key must be introduced into the map and DLL
         // however before we do this we need to make sure that the capacity condition is honored
         if (size >= capacity) {
-            LFUNodeData dataToRemove = DLL.back();
-            LFUNodeAddrMap.erase(dataToRemove.key);
-            DLL.removeBack();
+            if (dummyWallNode->next == DLL.trailer) {
+                LFUNodeAddrMap.erase(dummyWallNode->prev->elem.key);
+                DLL.remove(dummyWallNode->prev);
+            } else {
+                LFUNodeAddrMap.erase(DLL.trailer->prev->elem.key);
+                DLL.remove(DLL.trailer->prev);
+            }
             size--;
         }
 
         // with the conditional removal done we can add the data to the front.
-        LFUNodeData dataToAdd;
-        dataToAdd.key = key;
-        dataToAdd.value = value;
-        DNode<LFUNodeData>* dNodePtr;
-        if (swapsActive) {
-            dNodePtr = DLL.addwRefReturn(DLL.trailer, dataToAdd);
-        } else {
-            dNodePtr = DLL.addwRefReturn(DLL.header->next, dataToAdd);
-        }
+        DNode<LFUNodeData>* dNodePtr = DLL.addwRefReturn(dummyWallNode->next, LFUNodeData { key, value, 1 });
         LFUNodeAddrMap.insert({ key, dNodePtr });
         size++;
         return;
