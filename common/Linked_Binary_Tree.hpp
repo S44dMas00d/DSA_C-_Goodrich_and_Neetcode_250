@@ -30,9 +30,13 @@ public:
             : v(_v)
         {
         }
-        E& operator*()
+        E& operator*() const
         {
             return v->e;
+        }
+        E* operator->() const
+        {
+            return &v->e;
         }
         Position left() const
         {
@@ -53,6 +57,18 @@ public:
         bool isExternal() const
         {
             return v->left == nullptr && v->right == nullptr;
+        }
+        bool isInternal() const
+        {
+            return !isExternal();
+        }
+        bool operator==(const Position& p) const
+        {
+            return v == p.v;
+        }
+        bool operator!=(const Position& p) const
+        {
+            return v != p.v;
         }
         friend class LinkedBinaryTree;
     };
