@@ -86,6 +86,10 @@ public:
             : v(vv)
         {
         }
+        TPos getPosUnderIterator() const
+        {
+            return v;
+        }
         const E& operator*() const { return *v; }
         E& operator*() { return *v; }
         bool operator==(const Iterator& p) const
@@ -244,9 +248,91 @@ void SearchTreeDict<E>::erase(const K& k)
         throw NonexistentElement("Erase of nonexistent");
     eraser(v);
 }
+
 template <typename E>
 void SearchTreeDict<E>::erase(const Iterator& p)
 {
     TPos v = p.v; // eraser() mutates its argument, so work on a local copy
     eraser(v);
+}
+
+template <typename E>
+SearchTreeDict<E>::TPos
+SearchTreeDict<E>::restructure(const TPos& v)
+{
+    // Node itself is a protected type of LinkedBinaryTree, so it can't be
+    // named here -- but Position::get() still hands back a valid pointer to
+    // one, and `auto` lets us hold onto it (and dereference it: Node's own
+    // fields are public) without ever having to spell the type out.
+    auto* x = v.get();
+    auto* y = x->parent;
+    auto* z = y->parent;
+    auto* z_parent = z->parent;
+
+    // Which slot of z_parent currently holds z. This is *independent* of
+    // which side y hangs off z (z can be z_parent's left child while y is
+    // z's right child -- an "inner" grandchild -- just as easily as the
+    // "outer" case where both sides match). Whichever node ends up
+    // promoted to z's old spot (y for a single rotation, x for a double
+    // rotation) gets attached on *this* side of z_parent -- the shape
+    // logic below must not also gate on it.
+    bool zWasLeftChild = (z_parent->left == z);
+    auto attachToZParent = [&](auto* promoted) {
+        if (zWasLeftChild) {
+            z_parent->left = promoted;
+        } else {
+            z_parent->right = promoted;
+        }
+        promoted->parent = z_parent;
+    };
+
+    // page 443 -- trinode restructuring, expressed as the 4 shapes {x,y,z}
+    // can be in, based purely on (is y z's left or right child) x (is x
+    // y's left or right child). Exactly one of these matches whenever
+    // restructure is called correctly (x a child of y, y a child of z).
+    if (z->right == y && y->right == x) {
+        // case (a): right-right -> single left rotation, y takes z's spot
+        attachToZParent(y);
+        z->parent = y;
+        z->right = y->left;
+        z->right->parent = z;
+        y->left = z;
+    } else if (z->left == y && y->left == x) {
+        // case (b): left-left -> single right rotation, y takes z's spot
+        attachToZParent(y);
+        z->parent = y;
+        z->left = y->right;
+        z->left->parent = z;
+        y->right = z;
+    } else if (z->right == y && y->left == x) {
+        // case (c): right-left -> double rotation, x takes z's spot
+        attachToZParent(x);
+        z->right = x->left;
+        z->right->parent = z;
+        y->left = x->right;
+        y->left->parent = y;
+        x->left = z;
+        z->parent = x;
+        x->right = y;
+        y->parent = x;
+    } else if (z->left == y && y->right == x) {
+        // case (d): left-right -> double rotation, x takes z's spot
+        attachToZParent(x);
+        z->left = x->right;
+        z->left->parent = z;
+        y->right = x->left;
+        y->right->parent = y;
+        x->right = z;
+        z->parent = x;
+        x->left = y;
+        y->parent = x;
+    } else {
+        // x/y/z didn't form a valid trinode (x not a child of y, or y not
+        // a child of z) -- a precondition violation by the caller, not
+        // something that should happen in normal AVL use.
+        throw std::logic_error(
+            "restructure: v, parent(v), grandparent(v) are not a valid trinode");
+    }
+
+    return TPos(zWasLeftChild ? z_parent->left : z_parent->right);
 }

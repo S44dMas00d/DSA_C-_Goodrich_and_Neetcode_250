@@ -30,6 +30,10 @@ public:
             : v(_v)
         {
         }
+        Node* get() const
+        {
+            return v;
+        }
         E& operator*() const
         {
             return v->e;
