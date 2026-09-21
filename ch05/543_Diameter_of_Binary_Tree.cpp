@@ -30,32 +30,6 @@ struct TreeNode {
 
 class Solution {
 public:
-    // int diameterOfBinaryTree(TreeNode* node)
-    // {
-    //     if (node == nullptr) {
-    //         return -1;
-    //     }
-    //     int stepsLeft = 1 + diameterOfBinaryTree(node->left);
-    //     int stepsRight = 1 + diameterOfBinaryTree(node->right);
-    //     int diameter = stepsLeft + stepsRight;
-    //     // int diameter = min(stepsLeft + stepsRight, diameter);
-    //     return max(stepsLeft, stepsRight);
-    // }
-
-    // if (node == nullptr) {
-    //     return -1;
-    // }
-    // int diameter = 0;
-    // int stepsLeft = 0;
-    // int stepsRight = 0;
-    // if (node->left == nullptr && node->right == nullptr) {
-    //     return 0;
-    // }
-    // stepsLeft = 1 + diameterOfBinaryTree(node->left);
-    // stepsRight = 1 + diameterOfBinaryTree(node->right);
-    // diameter = stepsLeft + stepsRight;
-    // return diameter;
-
     int heightOfNode(TreeNode* node)
     {
         if (node == nullptr) {
@@ -70,33 +44,21 @@ public:
 
     void diameterHelper(TreeNode* node, int& diameter)
     {
+        if (node == nullptr) {
+            return;
+        }
         int leftHeight = heightOfNode(node->left);
         int rightHeight = heightOfNode(node->right);
         diameter = max(leftHeight + rightHeight, diameter);
+        diameterHelper(rightHeight > leftHeight ? node->right : node->left, diameter);
     }
 
     int diameterOfBinaryTree(TreeNode* node)
     {
-        if (node == nullptr) {
-            return 0;
-        }
         int diameter = 0;
-        diameter = max(diameterOfBinaryTree(node->left), diameter);
-        diameter = max(diameterOfBinaryTree(node->right), diameter);
         diameterHelper(node, diameter);
         return diameter;
     }
-    // int diameterOfBinaryTree(TreeNode* node)
-    // {
-    //     if (node == nullptr) {
-    //         return 0;
-    //     }
-    //     int leftDia = diameterOfBinaryTree(node->left);
-    //     int rightDia = diameterOfBinaryTree(node->right);
-    //     int diameter = 0;
-    //     diameterHelper(node, diameter);
-    //     return diameter;
-    // }
 
     void preorderPrint(TreeNode* node, vector<int>& res)
     {
