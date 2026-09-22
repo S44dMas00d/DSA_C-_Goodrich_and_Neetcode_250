@@ -30,38 +30,23 @@ struct TreeNode {
 
 class Solution {
 public:
-    int heightOfNode(TreeNode* node)
+    int heightOfNode(TreeNode* node, bool& isBal)
     {
         if (node == nullptr) {
-            // return -1;
             return 0;
         }
-        int leftheight = 1 + heightOfNode(node->left);
-        int rightheight = 1 + heightOfNode(node->right);
-        int height = max(leftheight, rightheight);
+        int leftSteps = 1 + heightOfNode(node->left, isBal);
+        int rightSteps = 1 + heightOfNode(node->right, isBal);
+        int height = max(leftSteps, rightSteps);
+        isBal = isBal ? abs(leftSteps - rightSteps) <= 1 : isBal;
         return height;
     }
 
-    void diameterHelper(TreeNode* node, int& diameter)
+    bool isBalanced(TreeNode* root)
     {
-        if (node == nullptr) {
-            return;
-        }
-
-        const int leftHeight = heightOfNode(node->left);
-        const int rightHeight = heightOfNode(node->right);
-
-        diameter = std::max(diameter, leftHeight + rightHeight);
-
-        diameterHelper(node->left, diameter);
-        diameterHelper(node->right, diameter);
-    }
-
-    int diameterOfBinaryTree(TreeNode* node)
-    {
-        int diameter = 0;
-        diameterHelper(node, diameter);
-        return diameter;
+        bool isBal = true;
+        int height = heightOfNode(root, isBal);
+        return isBal;
     }
 
     void preorderPrint(TreeNode* node, vector<int>& res)
@@ -83,14 +68,19 @@ int main()
     TreeNode three(3);
     TreeNode four(4);
     TreeNode five(5);
+    TreeNode six(6);
+    TreeNode seven(7);
 
     one.left = &two;
-    one.right = &three;
-    two.left = &four;
-    two.right = &five;
+    two.left = &three;
+    three.left = &four;
+    one.right = &five;
+    five.right = &six;
+    six.right = &seven;
 
-    cout << Sol.heightOfNode(&one) << endl;
-    cout << Sol.diameterOfBinaryTree(&one) << endl;
+    cout << (Sol.isBalanced(&one) ? "true" : "false") << endl;
+    // cout << Sol.heightOfNode(&one) << endl;
+    // cout << Sol.diameterOfBinaryTree(&one) << endl;
 
     return 0;
 }
