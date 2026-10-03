@@ -1,3 +1,4 @@
+#include <climits>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -47,7 +48,8 @@ private:
         }
         int leftHeight = 1 + imbalanceCheckHelper(node->left, imbalancedNode);
         int rightHeight = 1 + imbalanceCheckHelper(node->right, imbalancedNode);
-        if (abs(leftHeight - rightHeight) > 1) {
+        // post-order, so the first one found is the lowest unbalanced node
+        if (!imbalancedNode && abs(leftHeight - rightHeight) > 1) {
             imbalancedNode = node;
         }
         return max(leftHeight, rightHeight);
@@ -121,22 +123,27 @@ private:
 public:
     TreeNode* insertIntoBST(TreeNode* root, int val)
     {
-        TreeNode newNode(val);
+        TreeNode* newNode = new TreeNode(val);
+        // dummy parent so that restructure also works when root is unbalanced
+        TreeNode dummy(INT_MAX, root, nullptr);
         // first we insert the new node
-        TreeNode* resNode = insertIntoBSTHelper(root, &newNode);
+        dummy.left = insertIntoBSTHelper(dummy.left, newNode);
         // then we find out if the tree got imbalanced and where
         TreeNode* imbalancedNode = nullptr;
-        imbalanceCheckHelper(resNode, imbalancedNode);
-        cout << (imbalancedNode ? imbalancedNode->val : 0) << endl;
+        imbalanceCheckHelper(dummy.left, imbalancedNode);
         // finally we apply rebalance on it till its not required
-        do {
-            restructure(imbalancedNode);
+        while (imbalancedNode) {
+            // restructure wants the parent of the imbalanced node
+            TreeNode* par = &dummy;
+            while (par->left != imbalancedNode && par->right != imbalancedNode) {
+                par = imbalancedNode->val < par->val ? par->left : par->right;
+            }
+            restructure(par);
             imbalancedNode = nullptr;
-            imbalanceCheckHelper(resNode, imbalancedNode);
-            /* code */
-        } while (imbalancedNode);
+            imbalanceCheckHelper(dummy.left, imbalancedNode);
+        }
 
-        return root;
+        return dummy.left;
     }
 
     void preorderPrint(TreeNode* node, vector<int>& res)
