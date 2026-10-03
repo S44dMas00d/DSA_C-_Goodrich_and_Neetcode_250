@@ -260,6 +260,35 @@ template <typename E>
 SearchTreeDict<E>::TPos
 SearchTreeDict<E>::restructure(const TPos& v)
 {
+    // Suppose you inserted an element - reference the example in Figure 10.9)
+    // in the book on page 441 - say you inserted node 54, then the 54 node is w
+    // w's parent is x, x's parent is y and y's parent is z. Now with that said,
+    // we can see in the same figure node 62 gets promoted which is inline with
+    // what the algorithm does for the double rotation shape we see in the figure,
+    // i.e., we promote x for the zig-zag type form.
+
+    // Most important is that if you inserted a node w, then according to figure
+    // 10.9 - its parent x is where you start your restructure(x) function.
+
+    // In removal however, figure 10.11 shows that you want to mark the parent of
+    // removed node w as the z node in the restructure algorithm, so you ought to
+    // get the position of x by doing the children follow as per the following:
+    // let z be the first unbalanced node encountered going up from w toward the root
+    // of T. Also, let y be the child of z with larger height (note that node y is
+    // the child of z that is not an ancestor of w), and let x be the child of y
+    // defined as follows: if one of the children of y is taller than the other, let x
+    // be the taller child of y; else (both children of y have the same height), let x
+    // be the child of y on the same side as y (that is, if y is a left child, let x
+    // be the left child of y, else let x be the right child of y). In any case, we
+    // then perform a restructure(x) operation, which restores the height-balance
+    // property locally, at the subtree that was formerly rooted at z and is rooted
+    // at the node we temporarily called b.
+
+    // NOTE: Unfortunately, this trinode restructuring may reduce the height of subtree
+    // rooted at b by 1, which may cause an ancestor of b to become unbalanced. So,
+    // after rebalancing z, we continue walking up T looking for unbalanced nodes.
+    // SO - we probably do need a checkIfSubtreeBalanced(x) function as well.
+
     // Node itself is a protected type of LinkedBinaryTree, so it can't be
     // named here -- but Position::get() still hands back a valid pointer to
     // one, and `auto` lets us hold onto it (and dereference it: Node's own
