@@ -104,10 +104,12 @@ public:
             else
                 ParNodePtr->right = nodePtr->right;
             // ParNodePtr->right = nullptr;
-        } else if (nodePtr->left && !nodePtr->left->left && !nodePtr->right) {
+        } else if (nodePtr->left && !nodePtr->right) {
+            // FIX 3: dropped "&& !nodePtr->left->left"
+            // (it sent some only-left-child nodes into the final else,
+            // where nodePtr->right is null -> crash)
             if (isLeftChild)
                 ParNodePtr->left = nodePtr->left;
-            // ParNodePtr->left = nullptr;
             else
                 ParNodePtr->right = nodePtr->left;
         } else if (nodePtr->left && nodePtr->right
@@ -122,15 +124,8 @@ public:
             // the nodePtr.
             parOfExchNode = nodePtr;
             exchNode = nodePtr->right;
-            // parOfExchNode = nodePtr->right->left ? nodePtr->right : nodePtr;
-            // while (!parOfExchNode->left && parOfExchNode->right->right) {
-            while (!exchNode->left && exchNode->right) {
-                int temp = exchNode->val;
-                exchNode->val = nodePtr->val;
-                nodePtr->val = temp;
-                parOfExchNode = exchNode;
-                exchNode = exchNode->right;
-            }
+            // FIX 1: removed the "while (!exchNode->left && exchNode->right)" value-swapping
+            // loop. It left the key's value in the tree and broke the BST ordering.
             while (exchNode->left) {
                 parOfExchNode = exchNode;
                 exchNode = exchNode->left;
@@ -146,7 +141,9 @@ public:
                 // now exch values:
                 parOfExchNode->val = exchNode->val;
                 // now remove the link to exchNode
-                parOfExchNode->right = exchNode->left ? exchNode->left : nullptr;
+                parOfExchNode->right = exchNode->right;
+                // FIX 2: was exchNode->left (always null here),
+                // which dropped exchNode's right subtree
             }
         }
         return root;
