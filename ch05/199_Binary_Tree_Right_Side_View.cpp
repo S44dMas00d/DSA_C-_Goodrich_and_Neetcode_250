@@ -30,27 +30,26 @@ struct TreeNode {
 
 class Solution {
 private:
-    void inorderLevelOrderHelper(TreeNode* node, int level, vector<vector<int>>& res)
+    void inorderRightSideViewHelper(TreeNode* node, int level, vector<int>& res)
     {
-        if (node == nullptr) {
+        if (!node) {
             return;
         }
-        inorderLevelOrderHelper(node->left, level + 1, res);
+        inorderRightSideViewHelper(node->left, level + 1, res);
         while (level >= static_cast<int>(res.size())) {
-            res.push_back(vector<int> {});
+            res.push_back(0);
         }
-        res[level].push_back(node->val);
-
-        inorderLevelOrderHelper(node->right, level + 1, res);
+        res[level] = node->val;
+        inorderRightSideViewHelper(node->right, level + 1, res);
         return;
     }
 
 public:
-    vector<vector<int>> levelOrder(TreeNode* root)
+    vector<int> rightSideView(TreeNode* root)
     {
-        std::vector<std::vector<int>> v;
-        inorderLevelOrderHelper(root, 0, v);
-        return v;
+        vector<int> res;
+        inorderRightSideViewHelper(root, 0, res);
+        return res; // implicit move for local var
     }
 
     void preorderPrint(TreeNode* node, vector<int>& res)
@@ -117,18 +116,18 @@ int main()
     TreeNode N80(80);
 
     // Tree # 1
-    N3.left = &N9;
-    N3.right = &N20;
-    N20.left = &N15;
-    N20.right = &N7;
+    N1.right = &N3;
+    N1.left = &N2;
+    N2.left = &N4;
+    N4.left = &N5;
 
-    vector<vector<int>> res = Sol.levelOrder(&N3);
+    vector<int> res = Sol.rightSideView(&N1);
 
     //     vector<int> res;
     // Sol.inorderPrint(&N3, res);
-    // for (size_t i = 0; i < res.size(); i++) {
-    //     cout << res[i] << endl;
-    // }
+    for (size_t i = 0; i < res.size(); i++) {
+        cout << res[i] << endl;
+    }
 
     return 0;
 }
