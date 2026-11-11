@@ -11,8 +11,8 @@ the code itself — when LeetCode hands you a plain `TreeNode{val,left,right}` a
 piece of BST logic against it.
 
 Both files compiled cleanly as of this writing; see [What was actually broken](#what-was-actually-broken)
-for the bugs that were fixed, and [`ch05/Dict_w_Binary_Search_Tree_Test.cpp`](../ch05/Dict_w_Binary_Search_Tree_Test.cpp)
-/ [`ch05/Linked_Binary_Tree_Test.cpp`](../ch05/Linked_Binary_Tree_Test.cpp) for runnable, traced examples.
+for the bugs that were fixed, and [`ch10/Dict_w_Binary_Search_Tree_Test.cpp`](../ch10/Dict_w_Binary_Search_Tree_Test.cpp)
+/ [`ch07/Linked_Binary_Tree_Test.cpp`](../ch07/Linked_Binary_Tree_Test.cpp) for runnable, traced examples.
 
 ---
 
@@ -495,7 +495,7 @@ Position/handle classes, here's what was missing and why each one mattered:
 
 Everything else — `finder`, `inserter`, `eraser`'s three cases, the sentinel trick, the iterator's
 successor logic — was already correct once it compiled; it was verified against traces like the ones in
-§3.4/§3.6 and against [`ch05/Dict_w_Binary_Search_Tree_Test.cpp`](../ch05/Dict_w_Binary_Search_Tree_Test.cpp)
+§3.4/§3.6 and against [`ch10/Dict_w_Binary_Search_Tree_Test.cpp`](../ch10/Dict_w_Binary_Search_Tree_Test.cpp)
 under AddressSanitizer/UBSan (insert, find, erase-by-key in all three cases, erase-by-iterator, erase the
 root, duplicate keys, draining to empty, erasing a missing key).
 
